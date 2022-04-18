@@ -1,6 +1,6 @@
 import Game from './components/Game';
 
-const FRAME_RATE = 30;
+const FRAME_RATE = 10;
 const WIDTH = 300;
 const HEIGHT = 500;
 
