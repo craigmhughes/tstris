@@ -1,6 +1,7 @@
 import Block from "./Block/Block";
 
 class Game {
+    blockSize: number;
     fps: number;
     now: null | number;
     then: number;
@@ -16,7 +17,9 @@ class Game {
         fps: number,
         width: number,
         height: number,
+        blockSize: number,
     ) {
+        this.blockSize = blockSize;
         this.fps = fps;
         this.now = null;
         this.then = Date.now();
@@ -34,18 +37,38 @@ class Game {
     setup() {
         this.canvas.width = this.width;
         this.canvas.height = this.height;
+
+        document.addEventListener('keypress', (e) => {
+            if (!this.activeBlock) return;
+
+            if (e.key === 'w') this.activeBlock.rotate();
+            else if (e.key === 'a') this.activeBlock.move('left');
+            else if (e.key === 's') this.activeBlock.move('down');
+            else if (e.key === 'd') this.activeBlock.move('right');
+
+            this.reset();
+            this.draw();
+            this.activeBlock.draw();
+        });
     }
 
     reset() {
         this.ctx.clearRect(0, 0, this.width, this.height);
     }
-    
-    main() {
+
+    draw() {
         this.ctx.fillStyle = 'black';
         this.ctx.fillRect(0, 0, this.width, this.height);
+    }
+    
+    main() {
+        this.draw();
 
-        if (!this.activeBlock) this.activeBlock = new Block(this.canvas, this.ctx);
-        else this.activeBlock.draw();
+        if (!this.activeBlock || this.activeBlock?.placed) this.activeBlock = new Block(this.canvas, this.ctx, this.blockSize);
+        this.activeBlock.draw();
+
+        if (this.activeBlock.pos.y + (this.blockSize * 2) < (this.canvas.height - this.blockSize)) this.activeBlock.pos.y += this.blockSize;
+        else this.activeBlock.placed = true;
     }
     
     play() {
