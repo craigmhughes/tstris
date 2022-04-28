@@ -13,6 +13,7 @@ class Game {
     ctx: CanvasRenderingContext2D;
     grid: number[];
     activeBlock: Block | null;
+    isMoving: boolean;
 
     constructor(
         fps: number,
@@ -34,6 +35,7 @@ class Game {
             (this.height / this.blockSize) * (this.width / this.blockSize)
         ).fill(0);
         this.activeBlock = null;
+        this.isMoving = false;
 
         console.log(this.grid);
 
@@ -45,14 +47,16 @@ class Game {
         this.canvas.height = this.height;
 
         document.addEventListener('keypress', (e) => {
-            if (!this.activeBlock) return;
+            if (!this.activeBlock || this.activeBlock.placed) {
+                return;
+            }
 
             if (e.key === 'w') this.activeBlock.rotate();
             else if (e.key === 'a') this.activeBlock.move('left');
             else if (e.key === 's') this.activeBlock.move('down');
             else if (e.key === 'd') this.activeBlock.move('right');
 
-            this.reset();
+            this.check();
             this.draw();
             this.activeBlock.draw();
         });
@@ -64,18 +68,41 @@ class Game {
 
     check() {
         if (!this.activeBlock) return;
+        const yBreak = Math.floor((this.width / this.blockSize));
+        let hitBlock = false;
+
+        for(const [i, v] of Object.entries(this.activeBlock.shape)) {
+            if (v !== 0) {
+                const xToCheck = (this.activeBlock.pos.x / this.blockSize);
+                const yToCheck = (this.activeBlock.pos.y / this.blockSize) + 1;
+                const yOffset = (Math.floor((parseInt(i)) / 4) * yBreak);
+                const startPoint = (yToCheck * yBreak) + xToCheck;
+
+                const spaceToCheck = (startPoint + Math.floor(parseInt(i) % 4) + yOffset);
+
+                if (this.grid[spaceToCheck] !== 0 || spaceToCheck > this.grid.length) {
+                    console.log(this.grid[spaceToCheck]);
+                    hitBlock = true;
+                    break;
+                }
+            }
+        }
+
+        if (!hitBlock) return false;
 
         for(const [i, v] of Object.entries(this.activeBlock.shape)) {
             if (v !== 0) {
                 const xToCheck = (this.activeBlock.pos.x / this.blockSize);
                 const yToCheck = (this.activeBlock.pos.y / this.blockSize);
-                const yBreak = Math.floor((this.width / this.blockSize));
-                const yOffset = (Math.floor(parseInt(i) / 4) * yBreak);
+                const yOffset = (Math.floor((parseInt(i)) / 4) * yBreak);
                 const startPoint = (yToCheck * yBreak) + xToCheck;
 
-                // this.grid[(startPoint + Math.floor(parseInt(i) % 4) + yOffset)] = v;
+                this.grid[(startPoint + Math.floor(parseInt(i) % 4) + yOffset)] = v;
             }
         }
+
+        this.activeBlock.placed = true;
+        return true;
     }
 
     draw() {
@@ -96,11 +123,6 @@ class Game {
                 this.blockSize, 
                 this.blockSize
             );
-
-            // this.ctx.fillStyle = 'black';
-            // this.ctx.fillText(i, Math.floor(parseInt(i) % yOffset) * this.blockSize, 
-            // Math.floor(parseInt(i) / yOffset) * this.blockSize);
-
         }
     }
     
@@ -108,8 +130,8 @@ class Game {
         this.draw();
 
         if (!this.activeBlock || this.activeBlock?.placed) this.activeBlock = new Block(this.canvas, this.ctx, this.blockSize);
-        this.activeBlock.draw();
         this.check();
+        this.activeBlock.draw();
 
         if (this.activeBlock.pos.y + (this.blockSize * 2) < (this.canvas.height - this.blockSize)) this.activeBlock.pos.y += this.blockSize;
         else this.activeBlock.placed = true;
@@ -121,7 +143,7 @@ class Game {
         const now = Date.now();
         const elapsed = now - this.then;
         
-        if (elapsed > this.interval) {
+        if (elapsed > this.interval && !this.isMoving) {
             this.then = now - (elapsed % this.interval);
             this.reset();
             this.main();
