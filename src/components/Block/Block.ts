@@ -60,7 +60,10 @@ class Block {
 
         this.shape = blocks[this.type as keyof typeof blocks].values[this.shapeIndex] as number[];
 
-        if (this.pos.x < 0 && !this.checkLeftCol(this.pos.x)) this.pos.x = 0;
+        if ((this.pos.x > 0 && this.pos.x <= this.blockSize) || (this.pos.x < 0 && !this.checkLeftCol(this.pos.x))) this.pos.x = 0;
+        else if (this.pos.x >= (this.canvas.width - (this.blockSize * 3)) && !this.checkRightCol()) {
+            this.pos.x = (this.canvas.width - (this.blockSize * 4));
+        }
     }
 
     checkLeftCol(offset: number) {
@@ -77,6 +80,13 @@ class Block {
         return (idxs.every((i) => (i === 0)));
     }
 
+    checkRightCol() {
+        const arr = Array.from(this.shape);
+        const idxs = [arr[3], arr[7], arr[11], arr[15]];
+
+        return (idxs.every((i) => (i === 0)));
+    }
+
     move(direction: string) {
         if (direction === 'left') {
             if (
@@ -84,7 +94,13 @@ class Block {
                 (this.pos.x <= 0 && this.checkLeftCol(this.pos.x))
             )   this.pos.x -= this.blockSize;
         }
-        else if (direction === 'right' && this.pos.x < (this.canvas.width - (this.blockSize * 3))) this.pos.x += this.blockSize;
+        else if (direction === 'right') {
+            if (
+                this.pos.x < (this.canvas.width - (this.blockSize * 4)) ||
+                (this.pos.x < (this.canvas.width - (this.blockSize * 3)) && this.checkRightCol())
+            )
+            this.pos.x += this.blockSize;
+        }
         else if (direction === 'down' && this.pos.y < (this.canvas.height - (this.blockSize * 3))) this.pos.y += this.blockSize;
     }
 }
