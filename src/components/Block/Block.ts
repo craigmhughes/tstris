@@ -23,6 +23,7 @@ class Block {
         this.ctx = ctx;
         this.blockSize = blockSize;
         this.type = Object.keys(blocks)[Math.floor(Math.random() * Object.keys(blocks).length)];
+        // this.type = 'hero';
         this.shapeIndex = 0;
         this.shape = blocks[this.type as keyof typeof blocks].values[this.shapeIndex] as number[];
         this.color = blocks[this.type as keyof typeof blocks].color;
@@ -58,10 +59,31 @@ class Block {
         }
 
         this.shape = blocks[this.type as keyof typeof blocks].values[this.shapeIndex] as number[];
+
+        if (this.pos.x < 0 && !this.checkLeftCol(this.pos.x)) this.pos.x = 0;
+    }
+
+    checkLeftCol(offset: number) {
+        offset = offset === 0 ? offset : (offset * -1) / this.blockSize;
+
+        const arr = Array.from(this.shape);
+        const idxs = [
+            arr[0 + offset], 
+            arr[4 + offset], 
+            arr[8 + offset], 
+            arr[12 + offset]
+        ];
+
+        return (idxs.every((i) => (i === 0)));
     }
 
     move(direction: string) {
-        if (direction === 'left' && this.pos.x > 0) this.pos.x -= this.blockSize;
+        if (direction === 'left') {
+            if (
+                this.pos.x > 0 || 
+                (this.pos.x <= 0 && this.checkLeftCol(this.pos.x))
+            )   this.pos.x -= this.blockSize;
+        }
         else if (direction === 'right' && this.pos.x < (this.canvas.width - (this.blockSize * 3))) this.pos.x += this.blockSize;
         else if (direction === 'down' && this.pos.y < (this.canvas.height - (this.blockSize * 3))) this.pos.y += this.blockSize;
     }

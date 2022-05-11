@@ -51,14 +51,18 @@ class Game {
                 return;
             }
 
+            this.check();
+
             if (e.key === 'w') this.activeBlock.rotate();
             else if (e.key === 'a') this.activeBlock.move('left');
             else if (e.key === 's') this.activeBlock.move('down');
             else if (e.key === 'd') this.activeBlock.move('right');
 
-            this.check();
             this.draw();
-            this.activeBlock.draw();
+
+            if (!this.activeBlock.placed) {
+                this.activeBlock.draw();
+            }
         });
     }
 
@@ -98,6 +102,20 @@ class Game {
                 const startPoint = (yToCheck * yBreak) + xToCheck;
 
                 this.grid[(startPoint + Math.floor(parseInt(i) % 4) + yOffset)] = v;
+
+                const yRow = yToCheck + Math.round(yOffset / this.blockSize);
+                const rowStart = (yBreak * yRow);
+                const rowEnd = rowStart + yBreak;
+
+                const rowExcerpt = this.grid.slice(rowStart, rowEnd);
+
+                if (!rowExcerpt.includes(0)) {
+                    this.grid = [
+                        ...(Array.apply(null, new Array(yBreak)) as number[]),
+                        ...this.grid.slice(0, rowStart),
+                        ...this.grid.slice(rowEnd, this.grid.length),
+                    ];
+                }
             }
         }
 
@@ -125,6 +143,21 @@ class Game {
             );
         }
     }
+
+    place() {
+        if (!this.activeBlock) return;
+
+        let yOffset = 0;
+
+        for (const [i, v] of Object.entries(this.activeBlock.shape)) {
+            if (v !== 0) yOffset = Math.round(parseInt(i) / 4);
+        }
+
+        console.log(yOffset);
+
+        if (this.activeBlock.pos.y + (this.blockSize * yOffset) <= (this.canvas.height - this.blockSize)) this.activeBlock.pos.y += this.blockSize;
+        else this.activeBlock.placed = true;
+    }
     
     main() {
         this.draw();
@@ -132,9 +165,7 @@ class Game {
         if (!this.activeBlock || this.activeBlock?.placed) this.activeBlock = new Block(this.canvas, this.ctx, this.blockSize);
         this.check();
         this.activeBlock.draw();
-
-        if (this.activeBlock.pos.y + (this.blockSize * 2) < (this.canvas.height - this.blockSize)) this.activeBlock.pos.y += this.blockSize;
-        else this.activeBlock.placed = true;
+        this.place();
     }
     
     play() {
