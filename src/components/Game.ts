@@ -92,30 +92,50 @@ class Game {
             }
         }
 
+        // TODO: Remove test grid on completion!
+        // for(const [i, v] of Object.entries(this.grid)) {
+        //     const xOffset = Math.floor((this.height / this.blockSize));
+        //     const yOffset = Math.floor((this.width / this.blockSize));
+        //     this.ctx.fillStyle = 'red';
+        //     this.ctx.fillRect(
+        //         Math.floor(parseInt(i) % yOffset) * this.blockSize, 
+        //         Math.floor(parseInt(i) / yOffset) * this.blockSize, 
+        //         this.blockSize, 
+        //         this.blockSize
+        //     );
+        //     this.ctx.fillStyle = 'white';
+        //     this.ctx.fillText(
+        //         i,
+        //         Math.floor(parseInt(i) % yOffset) * this.blockSize, 
+        //         Math.floor(parseInt(i) / yOffset) * this.blockSize + 10,
+        //     )
+        // }
+
         if (!hitBlock) return false;
+
+        const xToCheck = (this.activeBlock.pos.x / this.blockSize);
+        const yToCheck = (this.activeBlock.pos.y / this.blockSize);
+        const startPoint = (yToCheck * yBreak) + xToCheck;
 
         for(const [i, v] of Object.entries(this.activeBlock.shape)) {
             if (v !== 0) {
-                const xToCheck = (this.activeBlock.pos.x / this.blockSize);
-                const yToCheck = (this.activeBlock.pos.y / this.blockSize);
                 const yOffset = (Math.floor((parseInt(i)) / 4) * yBreak);
-                const startPoint = (yToCheck * yBreak) + xToCheck;
-
                 this.grid[(startPoint + Math.floor(parseInt(i) % 4) + yOffset)] = v;
+            }
+        }
 
-                const yRow = yToCheck + Math.round(yOffset / this.blockSize);
-                const rowStart = (yBreak * yRow);
-                const rowEnd = rowStart + yBreak;
+        for(let i = 0; i < (this.grid.length / yBreak); i++){
+            const rowStart = (yBreak * i);
+            const rowEnd = (yBreak * i) + yBreak;
+            const excerpt = [...this.grid.slice(rowStart, rowEnd)];
 
-                const rowExcerpt = this.grid.slice(rowStart, rowEnd);
-
-                if (!rowExcerpt.includes(0)) {
-                    this.grid = [
-                        ...(Array.apply(null, new Array(yBreak)) as number[]),
-                        ...this.grid.slice(0, rowStart),
-                        ...this.grid.slice(rowEnd, this.grid.length),
-                    ];
-                }
+            if (!excerpt.includes(0)) {
+                this.grid = [
+                    ...(new Array(yBreak) as number[]).fill(0),
+                    ...this.grid.slice(0, rowStart),
+                    ...this.grid.slice(rowEnd, this.grid.length),
+                ];
+        
             }
         }
 
@@ -132,7 +152,6 @@ class Game {
         for(const [i, v] of Object.entries(this.grid)) {
             if (v === 0) continue;
 
-            const xOffset = Math.floor((this.height / this.blockSize));
             const yOffset = Math.floor((this.width / this.blockSize));
             this.ctx.fillStyle = colors[v];
             this.ctx.fillRect(
@@ -152,8 +171,6 @@ class Game {
         for (const [i, v] of Object.entries(this.activeBlock.shape)) {
             if (v !== 0) yOffset = Math.round(parseInt(i) / 4);
         }
-
-        console.log(yOffset);
 
         if (this.activeBlock.pos.y + (this.blockSize * yOffset) <= (this.canvas.height - this.blockSize)) this.activeBlock.pos.y += this.blockSize;
         else this.activeBlock.placed = true;
