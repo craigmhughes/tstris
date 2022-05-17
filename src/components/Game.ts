@@ -1,6 +1,7 @@
 import Block from "./Block/Block";
 
 class Game {
+    playing: boolean;
     blockSize: number;
     fps: number;
     now: null | number;
@@ -14,6 +15,7 @@ class Game {
     grid: number[];
     activeBlock: Block | null;
     isMoving: boolean;
+    background: string;
 
     constructor(
         fps: number,
@@ -21,6 +23,7 @@ class Game {
         height: number,
         blockSize: number,
     ) {
+        this.playing = true;
         this.blockSize = blockSize;
         this.fps = fps;
         this.now = null;
@@ -36,6 +39,7 @@ class Game {
         ).fill(0);
         this.activeBlock = null;
         this.isMoving = false;
+        this.background = '#ededed';
 
         console.log(this.grid);
 
@@ -112,6 +116,7 @@ class Game {
         // }
 
         if (!hitBlock) return false;
+        else if (this.activeBlock.pos.y <= 10) return this.playing = false;
 
         const xToCheck = (this.activeBlock.pos.x / this.blockSize);
         const yToCheck = (this.activeBlock.pos.y / this.blockSize);
@@ -144,10 +149,10 @@ class Game {
     }
 
     draw() {
-        this.ctx.fillStyle = 'black';
+        this.ctx.fillStyle = this.background;
         this.ctx.fillRect(0, 0, this.width, this.height);
 
-        const colors = ['black', 'orange', 'blue', 'red', 'green', 'cyan', 'purple', 'yellow'];
+        const colors = [this.background, '#ff5b02', '#5d4ffe', '#ff0044', '#00ff8a', '#48bbfe', '#ab54e3', '#ffb200'];
 
         for(const [i, v] of Object.entries(this.grid)) {
             if (v === 0) continue;
@@ -191,7 +196,7 @@ class Game {
         const now = Date.now();
         const elapsed = now - this.then;
         
-        if (elapsed > this.interval && !this.isMoving) {
+        if (elapsed > this.interval && this.playing) {
             this.then = now - (elapsed % this.interval);
             this.reset();
             this.main();

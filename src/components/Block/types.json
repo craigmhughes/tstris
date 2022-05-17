@@ -1,6 +1,6 @@
 {
     "orangeRicky": {
-        "color": "orange",
+        "color": "#ff5b02",
         "values": [
             [
                 0, 0, 0, 0,
@@ -29,7 +29,7 @@
         ]
     },
     "blueRicky": {
-        "color": "blue",
+        "color": "#5d4ffe",
         "values": [
             [
                 0, 0, 0, 0,
@@ -58,7 +58,7 @@
         ]
     },
     "clevelandZ": {
-        "color": "red",
+        "color": "#ff0044",
         "values": [
             [
                 0, 0, 0, 0,
@@ -87,7 +87,7 @@
         ]
     },
     "rhodeIslandZ": {
-        "color": "green",
+        "color": "#00ff8a",
         "values": [
             [
                 0, 0, 0, 0,
@@ -117,7 +117,7 @@
     },
     
     "hero": {
-        "color": "cyan",
+        "color": "#48bbfe",
         "values": [
             [
                 0, 0, 0, 0,
@@ -146,7 +146,7 @@
         ]
     },
     "teewee": {
-        "color": "purple",
+        "color": "#ab54e3",
         "values": [
             [
                 0, 0, 0, 0,
@@ -175,7 +175,7 @@
         ]
     },
     "smashboy": {
-        "color": "yellow",
+        "color": "#ffb200",
         "values": [
             [
                 0, 0, 0, 0,
