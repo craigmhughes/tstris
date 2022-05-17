@@ -5,9 +5,29 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TStris</title>
+    <link href="output.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
 </head>
 <body>
-    <canvas id="screen"></canvas>
+    <main>
+        <header>
+            <h1 class="text-xl font-bold" id="title"><span>TS</span>tris</h1>
+            <p class="text-xs leading-10" id="ctrl-msg"><strong>WASD</strong>, you know the drill!</p>
+        </header>
+        <div class="content">
+            <canvas id="screen"></canvas>
+        </div>
+        <footer>
+            <p class="text-xs leading-10">
+                Made with 
+                <a href="https://www.typescriptlang.org/" id="ts-link">
+                    <img src="./heart.svg"/>
+                    Typescript
+                </a>
+                by <a href="https://twitter.com/hghscraig">@hghscraig</a>
+            </p>
+        </footer>
+    </main>
     <script src="bundle.js"></script>
 </body>
 </html>
